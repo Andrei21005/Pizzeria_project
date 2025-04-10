@@ -1,0 +1,119 @@
+[
+    {
+        "name": "Баварская",
+        "image_url": "/storage/images/pizzas/bavarian.png",
+        "ingredients": "Сливочный соус, моцарелла, баварские колбаски, лук, горчица",
+        "proteins": 10.2,
+        "fats": 12.8,
+        "carbohydrates": 26.5,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 430, "price": 23.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 640, "price": 31.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 870, "price": 38.99}
+        ]
+    },
+    {
+        "name": "Сырная",
+        "image_url": "/storage/images/pizzas/cheese.png",
+        "ingredients": "Сливочный соус, моцарелла, чеддер, дор блю, пармезан, сливочный сыр",
+        "proteins": 13.5,
+        "fats": 18.2,
+        "carbohydrates": 22.7,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 440, "price": 8.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 660, "price": 16.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 890, "price": 22.99}
+        ]
+    },
+    {
+        "name": "Деревенская",
+        "image_url": "/storage/images/pizzas/village.png",
+        "ingredients": "Томатный соус, моцарелла, картофель, грибы, лук, укроп, бекон",
+        "proteins": 8.7,
+        "fats": 9.3,
+        "carbohydrates": 34.1,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 450, "price": 23.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 670, "price": 31.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 900, "price": 38.99}
+        ]
+    },
+    {
+        "name": "Четыре сезона",
+        "image_url": "/storage/images/pizzas/four_seasons.png",
+        "ingredients": "Томатный соус, моцарелла, ветчина, грибы, артишоки, оливки",
+        "proteins": 9.1,
+        "fats": 8.4,
+        "carbohydrates": 28.9,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 420, "price": 21.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 630, "price": 29.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 850, "price": 35.99}
+        ]
+    },
+    {
+        "name": "Ветчина и грибы",
+        "image_url": "/storage/images/pizzas/ham_mushrooms.png",
+        "ingredients": "Сливочный соус, моцарелла, ветчина, шампиньоны, петрушка",
+        "proteins": 10.5,
+        "fats": 9.7,
+        "carbohydrates": 27.3,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 410, "price": 17.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 620, "price": 26.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 840, "price": 32.99}
+        ]
+    },
+    {
+        "name": "Овощи и грибы",
+        "image_url": "/storage/images/pizzas/vegetables_mushrooms.png",
+        "ingredients": "Томатный соус, моцарелла, болгарский перец, баклажаны, цукини, шампиньоны",
+        "proteins": 6.8,
+        "fats": 5.2,
+        "carbohydrates": 30.4,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 390, "price": 21.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 590, "price": 29.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 800, "price": 35.99}
+        ]
+    },
+    {
+        "name": "Пепперони",
+        "image_url": "/storage/images/pizzas/pepperoni.png",
+        "ingredients": "Томатный соус, моцарелла, острая чоризо, перец чили",
+        "proteins": 11.3,
+        "fats": 14.5,
+        "carbohydrates": 26.8,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 430, "price": 17.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 650, "price": 26.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 880, "price": 32.99}
+        ]
+    },
+    {
+        "name": "Маргарита",
+        "image_url": "/storage/images/pizzas/margarita.png",
+        "ingredients": "Томатный соус, моцарелла, помидоры, базилик",
+        "proteins": 8.2,
+        "fats": 5.5,
+        "carbohydrates": 30.1,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 400, "price": 14.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 600, "price": 22.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 800, "price": 28.99}
+        ]
+    },
+    {
+        "name": "Мясная",
+        "image_url": "/storage/images/pizzas/meat.png",
+        "ingredients": "Томатный соус, моцарелла, ветчина, бекон, пепперони, курица",
+        "proteins": 12.7,
+        "fats": 14.2,
+        "carbohydrates": 27.9,
+        "sizes": [
+            {"size_name": "Маленькая", "diameter": 25, "weight": 450, "price": 23.99},
+            {"size_name": "Средняя", "diameter": 30, "weight": 650, "price": 31.99},
+            {"size_name": "Большая", "diameter": 35, "weight": 880, "price": 38.99}
+        ]
+    }
+]
