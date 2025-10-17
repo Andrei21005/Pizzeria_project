@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Pizza;
+use Illuminate\Database\Eloquent\Collection;
 
 // Класс PizzaRepository, реализующий интерфейс PizzaRepositoryInterface
 class PizzaRepository implements PizzaRepositoryInterface
@@ -10,9 +11,9 @@ class PizzaRepository implements PizzaRepositoryInterface
     /**
      * Получение всех пицц с их доступными размерами.
      *
-     * @return \Illuminate\Database\Eloquent\Collection Список всех пицц с размерами
+     * @return Collection<int, Pizza>
      */
-    public function getAll()
+    public function getAll(): Collection
     {
         return Pizza::with('sizes')->get(); // Загружает все пиццы с их размерами через связь
     }
@@ -25,19 +26,19 @@ class PizzaRepository implements PizzaRepositoryInterface
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Если пицца с данным ID не найдена
      */
-    public function findByID($id)
+    public function findByID($id): Pizza
     {
         return Pizza::with('sizes')->findOrFail($id); // Находит пиццу с заданным ID или выбрасывает исключение
     }
-    
+
     /**
      * Получение пицц по массиву идентификаторов.
      *
-     * @param array $ids Массив идентификаторов пицц
-     * @return \Illuminate\Database\Eloquent\Collection Список пицц с размерами
+     * @param int[] $ids Массив идентификаторов пицц
+     * @return Collection<int, Pizza>
      */
-    public function getByIDs(array $ids)
+    public function getByIDs(array $ids): Collection
     {
-        return Pizza::whereIn('id', $ids)->with('sizes')->get(); // Загружает пиццы, чьи ID содержатся в массиве
+        return Pizza::query()->whereIn('id', $ids)->with('sizes')->get();
     }
 }

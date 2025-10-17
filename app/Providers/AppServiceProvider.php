@@ -24,11 +24,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot()
+    public function boot(): void
     {
         // Для консольных команд не выполняем
-        if ($this->app->runningInConsole()) return;
-    
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
         // Инициализация гостевой сессии
         if (Auth::guest() && !session()->has('guest_id')) {
             session()->put([

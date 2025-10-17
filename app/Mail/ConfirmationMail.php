@@ -8,12 +8,12 @@ use Illuminate\Mail\Mailable;
 class ConfirmationMail extends Mailable
 {
     // Публичное свойство для хранения кода подтверждения
-    public $confirmationCode;
+    public int $confirmationCode;
 
     /**
      * Конструктор класса.
      *
-     * @param int|string $confirmationCode Код подтверждения, который будет отправлен в письме
+     * @param int $confirmationCode Код подтверждения, который будет отправлен в письме
      */
     public function __construct($confirmationCode)
     {
@@ -27,8 +27,8 @@ class ConfirmationMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Ваш код подтверждения заказа') // Установка темы письма
-                    ->view('emails.confirmation') // Указание представления для письма
-                    ->with(['code' => $this->confirmationCode]); // Передача данных в представление
+        return $this->subject('Ваш код подтверждения заказа') 
+                    ->view('emails.confirmation') 
+                    ->with(['code' => $this->confirmationCode]); 
     }
 }

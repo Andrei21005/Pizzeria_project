@@ -6,18 +6,19 @@ use Illuminate\Http\Request;
 use App\Repositories\PizzaRepositoryInterface;
 use App\Repositories\CartRepositoryInterface;
 use App\Services\MailService;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
 
 class CartController extends Controller
 {
-    // Репозитории и сервисы, которые будут использоваться в контроллере
-    protected $pizzaRepository;
-    protected $cartRepository;
-    protected $mailService;
+    protected PizzaRepositoryInterface $pizzaRepository;
+    protected CartRepositoryInterface $cartRepository;
+    protected MailService $mailService;
 
-    // Конструктор класса, принимающий зависимости через внедрение зависимостей
     public function __construct(PizzaRepositoryInterface $pizzaRepository, CartRepositoryInterface $cartRepository, MailService $mailService)
     {
         $this->pizzaRepository = $pizzaRepository;
@@ -28,21 +29,22 @@ class CartController extends Controller
     /**
      * Отображение содержимого корзины
      */
-    public function index(Request $request)
+    public function index(Request $request): View|string
     {
-        // Получение данных корзины из cookie и преобразование их в массив
-        $cart = json_decode($request->cookie('cart'), true) ?? [];
+        $cartCookie = $request->cookie('cart');
+        $cart = is_string($cartCookie) ? json_decode($cartCookie, true) ?? [] : [];
+        
         $pizzaIds = array_column($cart, 'id'); // Извлечение ID пицц из корзины
         $pizzas = $this->pizzaRepository->getByIDs($pizzaIds); // Получение данных о пиццах по ID
 
         $cartDetails = [];
         $totalPrice = 0;
 
-        // Формирование массива деталей корзины и подсчет общей стоимости
         foreach ($cart as $item) {
             $pizza = $pizzas->firstWhere('id', $item['id']);
             if ($pizza) {
-                $size = $pizza->sizes->firstWhere('size_name', $item['size']);
+                $sizes = $pizza->sizes;
+                $size = $sizes->firstWhere('size_name', $item['size']);
                 if ($size) {
                     $cartDetails[] = [
                         'id' => $pizza->id,
@@ -57,22 +59,26 @@ class CartController extends Controller
             }
         }
 
-        // Если запрос AJAX, возвращается частичный шаблон, иначе общий
         if ($request->ajax()) {
             return view('partials.cart', compact('cartDetails', 'totalPrice'))->render();
         }
         return view('cart', compact('cartDetails', 'totalPrice'));
     }
-    
+
     /**
      * Добавление пиццы в корзину
      */
-    public function add(Request $request)
+    public function add(Request $request): JsonResponse
     {
         $id = $request->input('id'); // ID пиццы
         $size = $request->input('size'); // Размер пиццы
 
-        $cart = json_decode($request->cookie('cart'), true) ?? [];
+        $cartCookie = $request->cookie('cart');
+        if (is_string($cartCookie)) {
+            $cart = json_decode($cartCookie, true) ?? [];
+        } else {
+            $cart = [];
+        }
 
         $key = $id . ':' . $size; // Уникальный ключ на основе ID и размера
         if (isset($cart[$key])) {
@@ -85,20 +91,24 @@ class CartController extends Controller
             ];
         }
 
-        // Возвращается обновленная корзина с установкой cookie
         $response = response()->json(['success' => true, 'cart' => $cart]);
-        return $response->cookie('cart', json_encode($cart), 60); 
+        return $response->cookie('cart', json_encode($cart), 60);
     }
 
     /**
      * Удаление пиццы из корзины
      */
-    public function remove(Request $request)
+    public function remove(Request $request): JsonResponse
     {
-        $id = $request->input('id'); 
-        $size = $request->input('size'); 
+        $id = $request->input('id');
+        $size = $request->input('size');
 
-        $cart = json_decode($request->cookie('cart'), true) ?? [];
+        $cartCookie = $request->cookie('cart');
+        if (is_string($cartCookie)) {
+            $cart = json_decode($cartCookie, true) ?? [];
+        } else {
+            $cart = [];
+        }
         $key = $id . ':' . $size;
 
         if (isset($cart[$key])) {
@@ -110,18 +120,19 @@ class CartController extends Controller
 
         // Обновление cookie с новой корзиной
         $response = response()->json(['success' => true, 'cart' => $cart]);
-        return $response->cookie('cart', json_encode($cart), 60); 
+        return $response->cookie('cart', json_encode($cart), 60);
     }
 
     /**
      * Сохранение текущей корзины в базе данных для авторизованного пользователя
      */
-    public function saveCart(Request $request)
+    public function saveCart(Request $request): JsonResponse
     {
+       /** @var User|null $user */
         $user = Auth::user();
         $cart = $request->input('cart');
 
-        if ($user && !empty($cart)) {
+        if ($user instanceof User && !empty($cart)) {
             $this->cartRepository->saveCart($user->id, $cart);
             return response()->json(['status' => 'success']);
         }
@@ -132,11 +143,12 @@ class CartController extends Controller
     /**
      * Загрузка сохраненной корзины из базы данных
      */
-    public function loadCart(Request $request)
+    public function loadCart(Request $request): JsonResponse
     {
+        /** @var User|null $user */
         $user = Auth::user();
 
-        if ($user) {
+        if ($user instanceof User) {
             $savedCart = $this->cartRepository->loadCart($user->id);
 
             if ($savedCart) {
@@ -151,31 +163,36 @@ class CartController extends Controller
     /**
      * Отправка кода подтверждения на email пользователя
      */
-    public function confirmDelivery(Request $request)
+    public function confirmDelivery(Request $request): JsonResponse
     {
+
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Пользователь не авторизован'], 401);
+        }
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255'
         ]);
-        
-        // Проверка времени последней отправки кода
+
         $lastSent = Cache::get('email_code_last_sent_' . Auth::id());
         if ($lastSent && Carbon::parse($lastSent)->diffInMinutes(Carbon::now()) < 5) {
             return response()->json([
                 'error' => 'Повторная отправка кода возможна только через 5 минут'
             ], 429);
         }
-        
-        $confirmationCode = random_int(1000, 9999); // Генерация случайного кода подтверждения
-        $expiresAt = now()->addMinutes(5); // Установка срока действия кода
+
+        $confirmationCode = random_int(1000, 9999); 
+        $expiresAt = now()->addMinutes(5); 
 
         try {
-            // Отправка кода на email пользователя
             $this->mailService->sendConfirmationMail(Auth::user()->email, $confirmationCode);
 
-            Cache::put('email_code_' . Auth::id(), $confirmationCode, $expiresAt); // Сохранение кода в кеш
+            Cache::put('email_code_' . Auth::id(), $confirmationCode, $expiresAt); 
             Cache::put('email_code_last_sent_' . Auth::id(), now(), now()->addMinutes(5));
-            
+
             return response()->json([
                 'message' => 'Код подтверждения отправлен на вашу почту!',
                 'expires_at' => $expiresAt->toDateTimeString()
@@ -190,13 +207,22 @@ class CartController extends Controller
     /**
      * Проверка кода подтверждения
      */
-    public function verifyCode(Request $request)
+    public function verifyCode(Request $request): JsonResponse
     {
         $request->validate([
             'code' => 'required|numeric'
         ]);
 
-        $savedCode = Cache::get('email_code_' . Auth::id());
+        $user_id = Auth::id();
+        $savedCode = Cache::get('email_code_' . $user_id);
+        $code = $request->input('code');
+        
+        if(!is_int($user_id)){
+            return response()->json([
+                'success' => false,
+                'message' => '!'
+            ]);
+        }
 
         if (!$savedCode) {
             return response()->json([
@@ -204,15 +230,14 @@ class CartController extends Controller
                 'message' => 'Код подтверждения не найден или истек срок действия'
             ]);
         }
-
-        if ($request->code != $savedCode) {
+    
+        if ($code != $savedCode) {
             return response()->json([
                 'success' => false,
                 'message' => 'Неверный код подтверждения'
             ]);
-        }
+        }     
 
-        // Удаление кода из кеша и корзины
         Cache::forget('email_code_' . Auth::id());
         $this->cartRepository->deleteCart(Auth::id());
         return response()->json([

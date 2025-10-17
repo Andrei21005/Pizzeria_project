@@ -17,7 +17,10 @@ class PizzaSize extends Model
         'weight',
         'price',
     ];
-
+    
+    /**
+    * @return BelongsTo<Pizza, PizzaSize>
+    */
     public function pizza(): BelongsTo
     {
         return $this->belongsTo(Pizza::class);

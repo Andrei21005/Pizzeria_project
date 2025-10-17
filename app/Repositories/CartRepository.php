@@ -9,9 +9,9 @@ class CartRepository implements CartRepositoryInterface
 {
     /**
      * Сохраняет корзину пользователя в базу данных.
-     * 
+     *
      * @param int $userId Идентификатор пользователя
-     * @param array $cart Данные корзины, которые нужно сохранить
+     * @param array<int, array{id: int, quantity: int, price: float}> $cart
      * @return bool Успешность операции (true или false)
      */
     public function saveCart(int $userId, array $cart): bool
@@ -24,7 +24,7 @@ class CartRepository implements CartRepositoryInterface
 
     /**
      * Загружает корзину пользователя из базы данных.
-     * 
+     *
      * @param int $userId Идентификатор пользователя
      * @return ?string JSON-строка с данными корзины или null, если записи не найдено
      */
@@ -35,7 +35,7 @@ class CartRepository implements CartRepositoryInterface
 
     /**
      * Удаляет корзину пользователя из базы данных.
-     * 
+     *
      * @param int $userId Идентификатор пользователя
      * @return bool Успешность операции (true, если корзина удалена, false в противном случае)
      */
